@@ -1,22 +1,11 @@
 #-*- coding: utf-8 -*-
 
 module NukokusaBot
-  module Authorize
-
-    def self.get_oauth_url(keys)
-      oauth = OAuth::Consumer.new(keys[:consumer_key],
-                                  keys[:consumer_secret],
-                                  :site => "https://twitter.com")
-      @@req_token = oauth.get_request_token
-      @@req_token.authorize_url
-    end
-
-    def self.get_oauth_token(pin)
-      token = @@req_token.get_access_token(:oauth_verifier => pin)
-      {:token => token.token, :token_secret => token.secret}
-    end
+  module OAuth
 
     def self.authorize
+      keys = ResourceManager.read_oauth_keys
+
       TweetStream.configure do |conf|
         conf.consumer_key       = keys[:consumer_key]
         conf.consumer_secret    = keys[:consumer_secret]
