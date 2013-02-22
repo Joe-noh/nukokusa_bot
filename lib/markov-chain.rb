@@ -13,15 +13,15 @@ module NukokusaBot
   class MarkovChain
 
     def initialize
-      @word_id  = Hash.new  # {'word1' => id1, 'word2' => id2}
+      @word_id  = Hash.new  # {id1 => 'word1', id2 => 'word2'}
       @tailings = Hash.new  # {id1 => {id2 => count, id3 => count}}
       @mecab = Natto::MeCab.new
 
       @max_id  = -1
-      register_words(['先頭', '末尾'])
+      register_words(['末尾', '先頭'])
     end
 
-    def append(sentence)
+    def add(sentence)
       words = @mecab.parse_as_nodes(sentence)[0..-2].map(&:compress)
 
       register_words(words)
@@ -33,9 +33,31 @@ module NukokusaBot
       require "pp"
       pp @tailings
     end
-    alias_method :<<, :append
+    alias_method :<<, :add
+    alias_method :append, :add
+
+    def generate(limit = 140)
+      puts
+      chain_ids = [rand(2..@max_id)]
+
+      chain_ids << choose_next_of(chain_ids.last) until chain_ids.last == 0
+
+      chain_to_string(chain_ids)
+    end
 
     private
+
+    def choose_next_of(id)
+      candidates = Array.new
+      @tailings[id].each do |id, count|
+        candidates << [id] * count
+      end
+      candidates.flatten.sample
+    end
+
+    def chain_to_string(ids)
+      puts @word_id.invert.values_at(*ids).collect{|word| word[2..-1]}.join
+    end
 
     def register_words(words)
       words.each do |word|
@@ -43,7 +65,6 @@ module NukokusaBot
           @max_id += 1
           @word_id[word] = @max_id
         end
-        puts @max_id
       end
     end
 
@@ -65,3 +86,11 @@ module NukokusaBot
   end
 end
 
+m = NukokusaBot::MarkovChain.new
+m.add "あいうえお"
+m.add "おえういあ"
+m.add "えおえおえ"
+
+1000.times do
+  m.generate
+end
