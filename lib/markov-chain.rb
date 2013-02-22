@@ -85,12 +85,3 @@ module NukokusaBot
     end
   end
 end
-
-m = NukokusaBot::MarkovChain.new
-m.add "あいうえお"
-m.add "おえういあ"
-m.add "えおえおえ"
-
-1000.times do
-  m.generate
-end
