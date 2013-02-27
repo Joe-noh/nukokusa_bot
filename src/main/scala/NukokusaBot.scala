@@ -8,11 +8,14 @@ class NukokusaBot {
   val markov = new MarkovChain
 
   val rules = makeRules
+  val schedules = makeSchedules
+
   val defaultRule = markovResponseRule
 
   val listener = new UserStreamListener {
     def onStatus(status: Status) = {
-      if (status.getText.startsWith("@nukokusa_bot")) {
+      if (status.getText.startsWith("@nukokusa_bot") ||
+	  status.getInReplyToScreenName == "nukokusa_bot") {
 	rules.find(_.isMatch(status)) match {
 	  case Some(rule) => rule.respondTo(status)
 	  case None => defaultRule.respondTo(status)
@@ -42,10 +45,9 @@ class NukokusaBot {
     def onException(ex: Exception) = ex.printStackTrace()
   }
 
-
   def run = {
-    val periodical = new PeriodicPost(45)
-    periodical.start
+    val scheduler = new Scheduler(schedules)
+    scheduler.start
 
     val stream = new TwitterStreamFactory().getInstance
     stream.addListener(listener)
@@ -64,6 +66,17 @@ class NukokusaBot {
     List[ResponseRule]()
   }
 
+  private def makeSchedules: List[Schedule] = {
+    List[Schedule](
+      new Schedule( 6, 23, 30) {
+	def task = twitter.updateStatus(markov.generateSentence(140))
+      },
+      new Schedule( 6,  6,  0) {
+	def task = twitter.updateStatus(TodaysTopic.getTopic(new Date))
+      }
+    )
+  }
+
   private def markovResponseRule: ResponseRule = {
     new ResponseRule {
       def isMatch(status: Status):Boolean = true
@@ -71,8 +84,7 @@ class NukokusaBot {
       def respondTo(status: Status): Unit = {
 	val user = status.getUser
 	val userName = user.getScreenName
-	val text = "@" + userName + " " + "honesty"
-	//"@" + userName + " " + markov.generateSentence(140 - userName.length - 2)
+	val text = "@" + userName + " " + markov.generateSentence(140 - userName.length - 2)
 
 	val statusUpdate = new StatusUpdate(text).inReplyToStatusId(status.getId)
 	twitter.updateStatus(statusUpdate)
