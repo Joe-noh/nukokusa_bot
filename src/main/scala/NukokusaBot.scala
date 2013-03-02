@@ -1,6 +1,7 @@
 package jp.nukokusabot
 
 import twitter4j._
+import java.util.Date
 
 class NukokusaBot {
 
