@@ -27,7 +27,7 @@ import scala.collection.immutable.TreeMap
 trait SignedRequestsAmazonApi {
   implicit def any2tap[A](obj: A): Tap[A] = new Tap(obj)
 
-  val conf = new Properties().tap(_.load(new FileInputStream("/home/jhonzawa/nukokusa_bot/src/main/resources/amazon.properties")))
+  val conf = new Properties().tap(_.load(getClass.getResourceAsStream("/amazon.properties")))
 
   val UTF8_CHARSET = "UTF-8"
   val HMAC_SHA256_ALGORITHM = "HmacSHA256"
