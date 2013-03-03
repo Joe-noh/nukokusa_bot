@@ -36,12 +36,11 @@ trait SignedRequestsAmazonApi {
 
   val endpoint = "ecs.amazonaws.com"
   val service = "AWSECommerceService"
-  val version = "2009-07-01"
+  val version = "2011-08-01"
 
   val secretKeySpec = new SecretKeySpec(conf.get("aws.secretAccessKey").toString.getBytes(UTF8_CHARSET), HMAC_SHA256_ALGORITHM)
 
   def sign(params: Map[String, String]) :String = {
-
     var sortedParamMap = TreeMap.empty[String, String]
     sortedParamMap = sortedParamMap.insert("AWSAccessKeyId", conf.get("aws.accessKeyId").toString)
     sortedParamMap = sortedParamMap.insert("AssociateTag", conf.get("aws.associateTag").toString)
@@ -59,9 +58,7 @@ trait SignedRequestsAmazonApi {
   }
 
   protected def hmac(stringToSign: String) :String = {
-
     try {
-
       val mac = Mac.getInstance(HMAC_SHA256_ALGORITHM);
       mac.init(secretKeySpec);
 
@@ -70,26 +67,21 @@ trait SignedRequestsAmazonApi {
 
       val encoder = new Base64();
       return encoder.encodeToString(rawHmac).trim();
-
     } catch {
       case _ => throw new RuntimeException(UTF8_CHARSET + " is unsupported!")
     }
   }
 
   protected def timestamp(): String = {
-
     val dfm = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
     dfm.setTimeZone(TimeZone.getTimeZone("GMT"));
     return dfm.format(Calendar.getInstance().getTime());
-
   }
 
   protected def canonicalize( sortedParamMap: SortedMap[String, String]): String = {
-
     sortedParamMap.map {
       (key) => percentEncodeRfc3986( key._1 ) + "=" + percentEncodeRfc3986(key._2)
     }.reduceLeft[String]{ (acc, url) => acc + "&" + url }
-
   }
 
   protected def percentEncodeRfc3986(s: String): String = {
