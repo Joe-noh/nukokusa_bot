@@ -4,11 +4,10 @@ import org.scalatest._
 
 class AmazonProductAdvertisingTest extends FlatSpec {
 
-  "'search' method" should "fetch list of products" in {
-    val amazon = new AmazonProductAdvertising
-    val list = amazon.search("harry potter")
+  val amazon = new AmazonProductAdvertising
 
-    assert(list.length === 10)
+  "'getAllItems' method" should "fetch list of 10 products" in {
+    assert(amazon.getAllItems("harry potter").length === 10)
   }
 
 }

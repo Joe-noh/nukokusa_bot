@@ -6,12 +6,16 @@ import scala.collection.immutable.TreeMap
 
 class AmazonProductAdvertising extends SignedRequestsAmazonApi {
 
-  def search(keyword: String) = {
+  def getAllItems(keyword: String) = {
     val params = TreeMap("Operation"   -> "ItemSearch",
                          "SearchIndex" -> "All",
                          "Keywords"    -> keyword)
     val requestUrl = sign(params)
 
     XML.loadString(Source.fromURL(requestUrl).getLines.mkString) \\ "Item"
+  }
+
+  def getFirstItem(keyword: String) = {
+    getAllItems(keyword).head
   }
 }

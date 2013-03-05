@@ -15,11 +15,10 @@ class NukokusaBot {
 
   val listener = new UserStreamListener {
     def onStatus(status: Status) = {
-      if (status.getText.startsWith("@nukokusa_bot") ||
-	  status.getInReplyToScreenName == "nukokusa_bot") {
-	rules.find(_.isMatch(status)) match {
-	  case Some(rule) => rule.respondTo(status)
-	  case None => defaultRule.respondTo(status)
+      if (status.getText.startsWith("@nukokusa_bot") || status.getInReplyToScreenName == "nukokusa_bot") {
+        rules.find(_.isMatch(status)) match {
+          case Some(rule) => rule.respondTo(status)
+          case None => defaultRule.respondTo(status)
 	}
       }
     }
@@ -68,14 +67,27 @@ class NukokusaBot {
   }
 
   private def makeSchedules: List[Schedule] = {
-    List[Schedule](
-      new Schedule( 6, 23, 30) {
-	def task = twitter.updateStatus(markov.generateSentence(140))
-      },
-      new Schedule( 6,  6,  0) {
-	def task = twitter.updateStatus(TodaysTopic.getTopic(new Date))
+    val markovTweet = new Schedule {
+      def task = twitter.updateStatus(markov.generateSentence(140))
+    }
+    markovTweet.hourRange = 6 to 23
+    markovTweet.minRange  = 0 to 0
+
+    val todaysTopic = new Schedule {
+      def task = try {
+        twitter.updateStatus(TodaysTopic.getTopic(new Date))
+      } catch {
+        case _ =>
       }
-    )
+    }
+    todaysTopic.hourRange = 6 to 6
+    todaysTopic.minRange  = 0 to 0
+
+    val weeklyJUMP = new Schedule {
+      def task = {}
+    }
+
+    List[Schedule](markovTweet, todaysTopic)
   }
 
   private def markovResponseRule: ResponseRule = {
