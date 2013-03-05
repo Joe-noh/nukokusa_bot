@@ -3,7 +3,7 @@ package jp.nukokusabot
 import twitter4j._
 import java.util.Date
 
-class NukokusaBot {
+class NukokusaBot extends WeeklyJUMP {
 
   val twitter = new TwitterFactory().getInstance
   val markov = new MarkovChain
@@ -84,7 +84,9 @@ class NukokusaBot {
     todaysTopic.minRange  = 0 to 0
 
     val weeklyJUMP = new Schedule {
-      def task = {}
+      def task = {
+        val buyer = getJUMPBuyer
+      }
     }
 
     List[Schedule](markovTweet, todaysTopic)
