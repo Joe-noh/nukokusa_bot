@@ -2,7 +2,7 @@
 *.log
 
 twitter4j.properties
-config.scala
+config.xml
 
 # sbt specific
 dist/*
