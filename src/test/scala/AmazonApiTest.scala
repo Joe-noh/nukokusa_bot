@@ -3,7 +3,7 @@ package jp.nukokusabot
 import org.scalatest._
 import scala.collection.immutable.TreeMap
 
-class AmazonAPITest extends FlatSpec with SignedRequestsAmazonApi{
+class AmazonAPITest extends FlatSpec with SignedRequestsAmazonApi {
 
   "Amazon helper" should "give us a request URL" in {
     var params = TreeMap("Operation"   -> "ItemSearch",

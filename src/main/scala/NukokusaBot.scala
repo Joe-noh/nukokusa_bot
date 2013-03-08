@@ -114,4 +114,14 @@ class NukokusaBot extends WeeklyJUMP {
     }
   }
 
+  private def amazonProductRule: ResponseRule = {
+    new ResponseRule {
+      def isMatch(status: Status): Boolean = status.getText.matches("^.+(欲しい|買いたい).*$")
+
+      def respondTo(status: Status): Unit = {
+
+      }
+    }
+  }
+
 }
