@@ -1,13 +1,18 @@
 package jp.nukokusabot
 
-import java.util.Properties
+import scala.xml.XML
+import java.util.Calendar
 
 trait WeeklyJUMP {
-  implicit def any2tap[A](obj: A): Tap[A] = new Tap(obj)
 
-  def getJUMPBuyer = {
-    val buyers = new Properties().tap{_.load(getClass.getResourceAsStream("/jump.properties"))}
-//    buyers.find(_.get == 1)
+  def getJUMPBuyer: String = {
+    val conf = XML.load(getClass.getResource("/config.xml"))
+    val buyers = conf \\ "buyers"
+
+    val calendar = Calendar.getInstance
+    val idx = calendar.get(Calendar.WEEK_OF_YEAR) % buyers.length
+
+    return buyers(idx).text
   }
 
 }

@@ -2,7 +2,7 @@
 *.log
 
 twitter4j.properties
-amazon.properties
+config.scala
 
 # sbt specific
 dist/*

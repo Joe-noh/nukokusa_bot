@@ -11,7 +11,7 @@ class AmazonAPITest extends FlatSpec with SignedRequestsAmazonApi{
                          "Keywords"    -> "harry potter")
     val requestUrl = sign(params)
 
-    assert(requestUrl.matches("^http://ecs\\.amazonaws\\.com/onca/xml\\?.+$"))
+    assert(requestUrl.matches("^http://ecs\\.amazonaws\\.jp/onca/xml\\?.+$"))
   }
 
 }

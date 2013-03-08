@@ -2,6 +2,7 @@ package jp.nukokusabot
 
 import twitter4j._
 import java.util.Date
+import java.util.Calendar
 
 class NukokusaBot extends WeeklyJUMP {
 
@@ -88,8 +89,11 @@ class NukokusaBot extends WeeklyJUMP {
         val buyer = getJUMPBuyer
       }
     }
+    weeklyJUMP.wdayRange = Calendar.MONDAY to Calendar.MONDAY
+    weeklyJUMP.hourRange = 7 to 7
+    weeklyJUMP.minRange  = 0 to 0
 
-    List[Schedule](markovTweet, todaysTopic)
+    List[Schedule](markovTweet, todaysTopic, weeklyJUMP)
   }
 
   private def markovResponseRule: ResponseRule = {

@@ -19,6 +19,6 @@ class TodaysTopicTest extends FlatSpec with PrivateMethodTester {
 
   "'getTopic' method" should "take one topic" in {
     val result = TodaysTopic.getTopic(new Date)
-    assert(result matches "^\\d+年\\d+月\\d+日.*")
+    assert(result matches "^\\d{1,4}年\\d{1,2}月\\d{1,2}日 \\- .*$")
   }
 }

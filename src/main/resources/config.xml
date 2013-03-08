@@ -1,0 +1,14 @@
+<config>
+  <aws>
+    <accessKeyId>AKIAIV7ZLDXSLM3XJ3FQ</accessKeyId>
+    <secretAccessKey>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</secretAccessKey>
+    <associateTag>joe-noh0427-22</associateTag>
+  </aws>
+  <jump>
+    <next_buyer>0</next_buyer>
+    <buyers>Joe_noh</buyers>
+    <buyers>nukokusa</buyers>
+    <buyers>salinger01101</buyers>
+    <buyers>s2_EV</buyers>
+  </jump>
+</config>
