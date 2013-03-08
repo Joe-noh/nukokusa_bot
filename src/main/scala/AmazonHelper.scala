@@ -34,7 +34,7 @@ trait SignedRequestsAmazonApi {
   val REQUEST_URI = "/onca/xml"
   val REQUEST_METHOD = "GET"
 
-  val endpoint = "ecs.amazonaws.jp"
+  val endpoint = "webservices.amazon.co.jp"
   val service = "AWSECommerceService"
   val version = "2011-08-01"
 

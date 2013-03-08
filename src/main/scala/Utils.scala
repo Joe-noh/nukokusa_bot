@@ -7,7 +7,7 @@ trait Utils {
 
   def timestamp = {
     val now = new Timestamp(Calendar.getInstance.getTimeInMillis)
-    now.toString.split('.')(0)
+    "[" + now.toString.split('.')(0) + "]"
   }
 
 }

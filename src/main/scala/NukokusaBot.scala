@@ -4,10 +4,11 @@ import twitter4j._
 import java.util.Date
 import java.util.Calendar
 
-class NukokusaBot extends WeeklyJUMP {
+class NukokusaBot extends WeeklyJUMP with Utils {
 
   val twitter = new TwitterFactory().getInstance
-  val markov = new MarkovChain
+  val markov  = new MarkovChain
+  val amazon  = new AmazonProductAdvertising
 
   val rules = makeRules
   val schedules = makeSchedules
@@ -76,7 +77,7 @@ class NukokusaBot extends WeeklyJUMP {
 
     val todaysTopic = new Schedule {
       def task = try {
-        twitter.updateStatus(TodaysTopic.getTopic(new Date))
+        twitter.updateStatus(TodaysTopic.getTopic(new Date) + " " + timestamp)
       } catch {
         case _ =>
       }
@@ -116,10 +117,25 @@ class NukokusaBot extends WeeklyJUMP {
 
   private def amazonProductRule: ResponseRule = {
     new ResponseRule {
-      def isMatch(status: Status): Boolean = status.getText.matches("^.+(欲しい|買いたい).*$")
+      def isMatch(status: Status): Boolean = {
+        status.getText.matches("^(.+)が?(欲しい|買いたい).*$")
+      }
 
       def respondTo(status: Status): Unit = {
+        val regexp  = "^(.+)が?(欲しい|買いたい).*$".r
+        val keyword = regexp.findFirstMatchIn(status.getText).get.group(1)
+        val item = amazon.getFirstItem(keyword)
 
+	val user = status.getUser
+	val userName = user.getScreenName
+
+	val text = "@"+userName+" "+item.title +" "+item.price+"円"+" "+item.url+" "+timestamp
+
+	val statusUpdate = new StatusUpdate(text).inReplyToStatusId(status.getId)
+	twitter.updateStatus(statusUpdate)
+
+	println(status.getText())
+	println(text)
       }
     }
   }
