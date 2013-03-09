@@ -79,7 +79,7 @@ class NukokusaBot extends WeeklyJUMP with Utils {
       def task = try {
         twitter.updateStatus(TodaysTopic.getTopic(new Date) + " " + timestamp)
       } catch {
-        case _ =>
+        case _: Throwable =>
       }
     }
     todaysTopic.hourRange = 6 to 6
