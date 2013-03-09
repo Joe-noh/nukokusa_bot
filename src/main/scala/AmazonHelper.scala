@@ -25,7 +25,6 @@ import scala.collection.immutable.TreeMap
 import scala.xml.XML
 
 trait SignedRequestsAmazonApi {
-  implicit def any2tap[A](obj: A): Tap[A] = new Tap(obj)
 
   val conf = XML.load(getClass.getResourceAsStream("/config.xml"))
 
