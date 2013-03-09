@@ -4,7 +4,9 @@ import twitter4j._
 import java.util.Date
 import java.util.Calendar
 
-class NukokusaBot extends WeeklyJUMP with Utils {
+import com.typesafe.scalalogging.slf4j._
+
+class NukokusaBot extends Logging with WeeklyJUMP with Utils {
 
   val twitter = new TwitterFactory().getInstance
   val markov  = new MarkovChain
@@ -13,15 +15,10 @@ class NukokusaBot extends WeeklyJUMP with Utils {
   val rules = makeRules
   val schedules = makeSchedules
 
-  val defaultRule = markovResponseRule
-
   val listener = new UserStreamListener {
     def onStatus(status: Status) = {
       if (status.getText.startsWith("@nukokusa_bot") || status.getInReplyToScreenName == "nukokusa_bot") {
-        rules.find(_.isMatch(status)) match {
-          case Some(rule) => rule.respondTo(status)
-          case None => defaultRule.respondTo(status)
-	}
+        rules.find(_.isMatch(status)).get.respondTo(status)
       }
     }
     def onBlock(sourse: User, blockedUser: User) = {}
@@ -65,7 +62,46 @@ class NukokusaBot extends WeeklyJUMP with Utils {
   }
 
   private def makeRules: List[ResponseRule] = {
-    List[ResponseRule]()
+    val markovResponse = new ResponseRule {
+      def isMatch(status: Status):Boolean = true
+
+      def respondTo(status: Status): Unit = {
+	val user = status.getUser
+	val userName = user.getScreenName
+	val text = "@" + userName + " " + markov.generateSentence(140 - userName.length - 2)
+
+	val statusUpdate = new StatusUpdate(text).inReplyToStatusId(status.getId)
+	twitter.updateStatus(statusUpdate)
+
+	println(status.getText())
+	println(text)
+      }
+    }
+
+    val amazonResponse = new ResponseRule {
+      def isMatch(status: Status): Boolean = {
+        status.getText.matches("^(.+)が?(欲しい|買いたい).*$")
+      }
+
+      def respondTo(status: Status): Unit = {
+        val regexp  = "^(.+)が?(欲しい|買いたい).*$".r
+        val keyword = regexp.findFirstMatchIn(status.getText).get.group(1)
+        val item = amazon.getFirstItem(keyword)
+
+	val user = status.getUser
+	val userName = user.getScreenName
+
+	val text = "@"+userName+" "+item.title +" "+item.price+"円"+" "+item.url+" "+timestamp
+
+	val statusUpdate = new StatusUpdate(text).inReplyToStatusId(status.getId)
+	twitter.updateStatus(statusUpdate)
+
+	println(status.getText())
+	println(text)
+      }
+    }
+
+    List[ResponseRule](amazonResponse, markovResponse)
   }
 
   private def makeSchedules: List[Schedule] = {
@@ -95,49 +131,6 @@ class NukokusaBot extends WeeklyJUMP with Utils {
     weeklyJUMP.minRange  = 0 to 0
 
     List[Schedule](markovTweet, todaysTopic, weeklyJUMP)
-  }
-
-  private def markovResponseRule: ResponseRule = {
-    new ResponseRule {
-      def isMatch(status: Status):Boolean = true
-
-      def respondTo(status: Status): Unit = {
-	val user = status.getUser
-	val userName = user.getScreenName
-	val text = "@" + userName + " " + markov.generateSentence(140 - userName.length - 2)
-
-	val statusUpdate = new StatusUpdate(text).inReplyToStatusId(status.getId)
-	twitter.updateStatus(statusUpdate)
-
-	println(status.getText())
-	println(text)
-      }
-    }
-  }
-
-  private def amazonProductRule: ResponseRule = {
-    new ResponseRule {
-      def isMatch(status: Status): Boolean = {
-        status.getText.matches("^(.+)が?(欲しい|買いたい).*$")
-      }
-
-      def respondTo(status: Status): Unit = {
-        val regexp  = "^(.+)が?(欲しい|買いたい).*$".r
-        val keyword = regexp.findFirstMatchIn(status.getText).get.group(1)
-        val item = amazon.getFirstItem(keyword)
-
-	val user = status.getUser
-	val userName = user.getScreenName
-
-	val text = "@"+userName+" "+item.title +" "+item.price+"円"+" "+item.url+" "+timestamp
-
-	val statusUpdate = new StatusUpdate(text).inReplyToStatusId(status.getId)
-	twitter.updateStatus(statusUpdate)
-
-	println(status.getText())
-	println(text)
-      }
-    }
   }
 
 }
