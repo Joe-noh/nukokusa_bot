@@ -3,6 +3,7 @@
 
 twitter4j.properties
 config.xml
+/log
 
 # sbt specific
 dist/*
