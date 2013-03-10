@@ -37,12 +37,12 @@ trait SignedRequestsAmazonApi {
   val service = "AWSECommerceService"
   val version = "2011-08-01"
 
-  val secretKeySpec = new SecretKeySpec((conf \\ "secretAccessKey").text.getBytes(UTF8_CHARSET), HMAC_SHA256_ALGORITHM)
+  val secretKeySpec = new SecretKeySpec(Config.awsSecretKey.getBytes(UTF8_CHARSET), HMAC_SHA256_ALGORITHM)
 
   def sign(params: Map[String, String]) :String = {
     var sortedParamMap = TreeMap.empty[String, String]
-    sortedParamMap = sortedParamMap.insert("AWSAccessKeyId", (conf \\ "accessKeyId").text)
-    sortedParamMap = sortedParamMap.insert("AssociateTag", (conf \\ "associateTag").text)
+    sortedParamMap = sortedParamMap.insert("AWSAccessKeyId", Config.awsAccessKeyId)
+    sortedParamMap = sortedParamMap.insert("AssociateTag", Config.awsAssociateTag)
     sortedParamMap = sortedParamMap.insert("Service", service)
     sortedParamMap = sortedParamMap.insert("Version", version)
     sortedParamMap = sortedParamMap.insert("Timestamp", timestamp())
@@ -67,7 +67,7 @@ trait SignedRequestsAmazonApi {
       val encoder = new Base64();
       return encoder.encodeToString(rawHmac).trim();
     } catch {
-      case _ => throw new RuntimeException(UTF8_CHARSET + " is unsupported!")
+      case _: Throwable => throw new RuntimeException(UTF8_CHARSET + " is unsupported!")
     }
   }
 
@@ -87,7 +87,7 @@ trait SignedRequestsAmazonApi {
     try {
       return URLEncoder.encode(s, UTF8_CHARSET).replace("+", "%20").replace("*", "%2A").replace("%7E", "~");
     } catch  {
-      case _ => throw new RuntimeException(UTF8_CHARSET + " is unsupported!")
+      case _: Throwable => throw new RuntimeException(UTF8_CHARSET + " is unsupported!")
     }
   }
 }

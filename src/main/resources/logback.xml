@@ -5,7 +5,7 @@
     <Encoding>UTF-8</Encoding>
     <File>log/nb.log</File>
     <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
-      <FileNamePattern>log/nb.%d{yyyyMMdd}.log</FileNamePattern>
+      <FileNamePattern>log/nb.%d.log</FileNamePattern>
       <MaxHistory>2</MaxHistory>
     </rollingPolicy>
     <layout class="ch.qos.logback.classic.PatternLayout">

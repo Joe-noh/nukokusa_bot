@@ -96,8 +96,6 @@ class NukokusaBot extends Logging with WeeklyJUMP with Utils {
 	val statusUpdate = new StatusUpdate(text).inReplyToStatusId(status.getId)
 	twitter.updateStatus(statusUpdate)
 
-	println(status.getText())
-	println(text)
       }
     }
 
@@ -131,6 +129,10 @@ class NukokusaBot extends Logging with WeeklyJUMP with Utils {
     weeklyJUMP.minRange  = 0 to 0
 
     List[Schedule](markovTweet, todaysTopic, weeklyJUMP)
+  }
+
+  private def updateStatus(status: StatusUpdate) = {
+    twitter.updateStatus(status)
   }
 
 }
