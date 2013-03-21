@@ -71,10 +71,7 @@ class NukokusaBot extends Logging with WeeklyJUMP with Utils {
 	val text = "@" + userName + " " + markov.generateSentence(140 - userName.length - 2)
 
 	val statusUpdate = new StatusUpdate(text).inReplyToStatusId(status.getId)
-	twitter.updateStatus(statusUpdate)
-
-	println(status.getText())
-	println(text)
+	updateStatus(statusUpdate)
       }
     }
 
@@ -94,8 +91,7 @@ class NukokusaBot extends Logging with WeeklyJUMP with Utils {
 	val text = "@"+userName+" "+item.title +" "+item.price+"円"+" "+item.url+" "+timestamp
 
 	val statusUpdate = new StatusUpdate(text).inReplyToStatusId(status.getId)
-	twitter.updateStatus(statusUpdate)
-
+	updateStatus(statusUpdate)
       }
     }
 
@@ -104,24 +100,34 @@ class NukokusaBot extends Logging with WeeklyJUMP with Utils {
 
   private def makeSchedules: List[Schedule] = {
     val markovTweet = new Schedule {
-      def task = twitter.updateStatus(markov.generateSentence(140))
+      def task = {
+        val statusUpdate = new StatusUpdate(markov.generateSentence(140))
+        updateStatus(statusUpdate)
+      }
     }
     markovTweet.hourRange = 6 to 23
     markovTweet.minRange  = 0 to 0
 
     val todaysTopic = new Schedule {
       def task = try {
-        twitter.updateStatus(TodaysTopic.getTopic(new Date) + " " + timestamp)
+        val statusUpdate = new StatusUpdate(TodaysTopic.getTopic(new Date)+" "+timestamp)
+        updateStatus(statusUpdate)
       } catch {
-        case _: Throwable =>
+        case e: Exception => logger.warn(e.getMessage)
       }
     }
     todaysTopic.hourRange = 6 to 6
     todaysTopic.minRange  = 0 to 0
 
     val weeklyJUMP = new Schedule {
-      def task = {
-        val buyer = getJUMPBuyer
+      def task = try {
+        val buyerName = getJUMPBuyerName
+
+        val text = "おい @"+buyerName+"、"+"ジャンプ買ってこいよ"+" "+timestamp
+        val statusUpdate = new StatusUpdate(text)
+        updateStatus(statusUpdate)
+      } catch {
+        case e: Exception => logger.warn(e.getMessage)
       }
     }
     weeklyJUMP.wdayRange = Calendar.MONDAY to Calendar.MONDAY
@@ -132,7 +138,12 @@ class NukokusaBot extends Logging with WeeklyJUMP with Utils {
   }
 
   private def updateStatus(status: StatusUpdate) = {
-    twitter.updateStatus(status)
+    if (Config.debug) {
+      logger.info("update '" + status.getStatus + "' DEBUG")
+    } else {
+      twitter.updateStatus(status)
+      logger.info("update '" + status.getStatus + "'")
+    }
   }
 
 }

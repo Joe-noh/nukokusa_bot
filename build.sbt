@@ -8,6 +8,7 @@ libraryDependencies ++= Seq(
     "org.twitter4j" % "twitter4j-core" % "3.0.3",
     "org.twitter4j" % "twitter4j-stream" % "3.0.3",
     "commons-codec" % "commons-codec" % "1.7",
+    "com.whalin" % "Memcached-Java-Client" % "3.0.1",
     "com.typesafe" %% "scalalogging-slf4j" % "1.0.1",
     "org.slf4j" % "slf4j-api" % "1.7.2",
     "ch.qos.logback" % "logback-core" % "1.0.9",

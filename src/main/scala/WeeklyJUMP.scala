@@ -5,7 +5,7 @@ import java.util.Calendar
 
 trait WeeklyJUMP {
 
-  def getJUMPBuyer: String = {
+  def getJUMPBuyerName: String = {
     val buyers = Config.jumpBuyers
 
     val calendar = Calendar.getInstance
