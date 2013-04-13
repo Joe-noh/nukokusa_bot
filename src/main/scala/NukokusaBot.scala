@@ -6,7 +6,7 @@ import java.util.Calendar
 
 import com.typesafe.scalalogging.slf4j._
 
-class NukokusaBot extends Logging with WeeklyJUMP with Utils {
+class NukokusaBot extends Logging with WeeklyJUMP {
 
   val twitter = new TwitterFactory().getInstance
   val markov  = new MarkovChain
@@ -88,7 +88,7 @@ class NukokusaBot extends Logging with WeeklyJUMP with Utils {
 	val user = status.getUser
 	val userName = user.getScreenName
 
-	val text = "@"+userName+" "+item.title +" "+item.price+"円"+" "+item.url+" "+timestamp
+	val text = "@"+userName+" "+item.title +" "+item.price+"円"+" "+item.url+" "+Utils.timestamp
 
 	val statusUpdate = new StatusUpdate(text).inReplyToStatusId(status.getId)
 	updateStatus(statusUpdate)
@@ -110,7 +110,7 @@ class NukokusaBot extends Logging with WeeklyJUMP with Utils {
 
     val todaysTopic = new Schedule {
       def task = try {
-        val statusUpdate = new StatusUpdate(TodaysTopic.getTopic(new Date)+" "+timestamp)
+        val statusUpdate = new StatusUpdate(TodaysTopic.getTopic(new Date)+" "+Utils.timestamp)
         updateStatus(statusUpdate)
       } catch {
         case e: Exception => logger.warn(e.getMessage)
@@ -123,7 +123,7 @@ class NukokusaBot extends Logging with WeeklyJUMP with Utils {
       def task = try {
         val buyerName = getJUMPBuyerName
 
-        val text = "おい @"+buyerName+"、"+"ジャンプ買ってこいよ"+" "+timestamp
+        val text = "おい @"+buyerName+"、"+"ジャンプ買ってこいよ"+" "+Utils.timestamp
         val statusUpdate = new StatusUpdate(text)
         updateStatus(statusUpdate)
       } catch {
