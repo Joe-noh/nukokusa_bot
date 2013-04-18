@@ -1,9 +1,9 @@
 package jp.nukokusabot
 
-import net.reduls.gomoku._
+import com.github.aselab.activerecord._
 
-class Word(val surface: String, val feature: String)
-
-object Word {
-  def apply(m: Morpheme) = new Word(m.surface, m.feature.substring(0, 2))
+case class Word(var surface: String, var feature: String) extends ActiveRecord {
+  lazy val links = hasMany[Link]
 }
+
+object Word extends ActiveRecordCompanion[Word]

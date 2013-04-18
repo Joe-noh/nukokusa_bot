@@ -4,14 +4,17 @@ import org.scalatest._
 
 class MarkovChainTest extends FlatSpec {
 
-  "Markov Chain" should "generate sentence rondamly" in {
-    val markov = new MarkovChain("for_test.db")
-    markov.addSentence("あいうえお")
+  "Markov Chain" should "generate random sentence" in {
+
+    val markov = new MarkovChain
+    val example = "これはテストのための例文です。"
+    markov.addSentence(example)
 
     val sentence = markov.generateSentence()
 
-//    Dictionary.scrap
-    assert("あいうえお" === sentence)
+    //Dictionary.dropAll
+    Dictionary.close
+    assert(example contains sentence)
   }
 
 }

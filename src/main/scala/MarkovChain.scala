@@ -5,12 +5,12 @@ import scala.collection.JavaConversions._
 
 import net.reduls.gomoku._
 
-class MarkovChain(val dbFile: String = "markov_chain.db") {
+class MarkovChain {
 
-  Dictionary.initialize(dbFile)
+  Dictionary.open
 
   def addSentence(sentence: String): Unit = {
-    val words = Tagger.parse(sentence).map(Word(_)).toList
+    val words = Tagger.parse(sentence).map(m => (m.surface, m.feature.substring(0, 2))).toList
 
     Dictionary.registerWords(words)
     Dictionary.registerLinks(words)
@@ -18,15 +18,15 @@ class MarkovChain(val dbFile: String = "markov_chain.db") {
 
   def generateSentence(limit: Int = 140): String = {
     def challenge: String = {
-      def make(preID: Int, idAcc: List[Int]): List[Int] = {
+      def make(preID: Long, idAcc: List[Long]): List[Long] = {
         val id = Dictionary.fetchNextID(preID)
         id match {
-          case i: Int if i <= 1 => idAcc
-          case _: Int  => make(id, idAcc :+ id)
+          case i: Long if i <= 2 => idAcc
+          case _: Long  => make(id, idAcc :+ id)
         }
       }
 
-      val (id, surface) = Dictionary.randomChoice
+      val id = Dictionary.randomChoice
       val sentence = Dictionary.translateToJapanese(make(id, List(id)))
       sentence match {
 	case _ if (sentence.length == 0 || sentence.length > limit) => challenge

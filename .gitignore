@@ -4,6 +4,7 @@
 
 twitter4j.properties
 config.xml
+application.conf
 /log
 
 # sbt specific
