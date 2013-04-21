@@ -53,14 +53,6 @@ class NukokusaBot extends Logging with WeeklyJUMP {
     stream.user
   }
 
-  def markov_test {
-    val mc = new MarkovChain
-    mc.addSentence("あいうえおあうえいあうえいあうえおいあうえいうえおあいえうえあいえおあ")
-    mc.addSentence("あえあえお")
-    mc.addSentence("おえういあ")
-    println(mc.generateSentence())
-  }
-
   private def makeRules: List[ResponseRule] = {
     val markovResponse = new ResponseRule {
       def isMatch(status: Status):Boolean = true
