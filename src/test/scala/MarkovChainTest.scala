@@ -12,8 +12,9 @@ class MarkovChainTest extends FlatSpec {
 
     val sentence = markov.generateSentence()
 
-    //Dictionary.dropAll
-    Dictionary.close
+    Dictionary.dropAll
+    //Dictionary.close
+    assert(example === sentence)
     assert(example contains sentence)
   }
 

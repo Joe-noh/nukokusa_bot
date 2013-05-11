@@ -1,8 +1,8 @@
 <config>
   <aws>
-    <accessKeyId>**********************</accessKeyId>
-    <secretAccessKey>****************************************</secretAccessKey>
-    <associateTag>**************</associateTag>
+    <accessKeyId>**************</accessKeyId>
+    <secretAccessKey>**********************************</secretAccessKey>
+    <associateTag>************</associateTag>
   </aws>
   <jump>
     <buyers>*******</buyers>

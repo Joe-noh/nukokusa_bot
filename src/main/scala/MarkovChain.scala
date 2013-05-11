@@ -1,4 +1,4 @@
-package jp.nukokusabot
+/*package jp.nukokusabot
 
 import scala.util.Random
 import scala.collection.JavaConversions._
@@ -37,4 +37,7 @@ class MarkovChain {
     challenge
   }
 
+  def parseTweetsZip = {}
+
 }
+ */

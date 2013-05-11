@@ -9,7 +9,6 @@ import com.typesafe.scalalogging.slf4j._
 class NukokusaBot extends Logging with WeeklyJUMP {
 
   val twitter = new TwitterFactory().getInstance
-  val markov  = new MarkovChain
   val amazon  = new AmazonProductAdvertising
 
   val rules = makeRules
@@ -17,6 +16,7 @@ class NukokusaBot extends Logging with WeeklyJUMP {
 
   val listener = new UserStreamListener {
     def onStatus(status: Status) = {
+      println(status.getText)
       if (status.getText.startsWith("@nukokusa_bot") || status.getInReplyToScreenName == "nukokusa_bot") {
         rules.find(_.isMatch(status)).get.respondTo(status)
       }
@@ -54,17 +54,10 @@ class NukokusaBot extends Logging with WeeklyJUMP {
   }
 
   private def makeRules: List[ResponseRule] = {
-    val markovResponse = new ResponseRule {
+    val emptyResponse = new ResponseRule {
       def isMatch(status: Status):Boolean = true
 
-      def respondTo(status: Status): Unit = {
-	val user = status.getUser
-	val userName = user.getScreenName
-	val text = "@" + userName + " " + markov.generateSentence(140 - userName.length - 2)
-
-	val statusUpdate = new StatusUpdate(text).inReplyToStatusId(status.getId)
-	updateStatus(statusUpdate)
-      }
+      def respondTo(status: Status): Unit = {}
     }
 
     val amazonResponse = new ResponseRule {
@@ -74,32 +67,27 @@ class NukokusaBot extends Logging with WeeklyJUMP {
 
       def respondTo(status: Status): Unit = {
         val regexp  = "^(.+)が?(欲しい|買いたい).*$".r
-        val keyword = regexp.findFirstMatchIn(status.getText).get.group(1)
-        val item = amazon.getFirstItem(keyword)
+        val keyword = regexp.findFirstMatchIn(status.getText).get.group(1).diff("@nukokusa_bot").trim
+	val userName = status.getUser.getScreenName
 
-	val user = status.getUser
-	val userName = user.getScreenName
-
-	val text = "@"+userName+" "+item.title +" "+item.price+"円"+" "+item.url+" "+Utils.timestamp
-
-	val statusUpdate = new StatusUpdate(text).inReplyToStatusId(status.getId)
-	updateStatus(statusUpdate)
+        var text = ""
+        try {
+          val item = amazon.getFirstItem(keyword)
+          text = "@"+userName+" "+item.title +" "+item.price+"円"+" "+item.url+" "+Utils.timestamp
+        } catch {
+          case e: Exception =>
+            text = "@"+userName+" Not Found. "+Utils.timestamp
+        } finally {
+          val statusUpdate = new StatusUpdate(text).inReplyToStatusId(status.getId)
+          updateStatus(statusUpdate)
+        }
       }
     }
 
-    List[ResponseRule](amazonResponse, markovResponse)
+    List[ResponseRule](amazonResponse, emptyResponse)
   }
 
   private def makeSchedules: List[Schedule] = {
-    val markovTweet = new Schedule {
-      def task = {
-        val statusUpdate = new StatusUpdate(markov.generateSentence(140))
-        updateStatus(statusUpdate)
-      }
-    }
-    markovTweet.hourRange = 6 to 23
-    markovTweet.minRange  = 0 to 0
-
     val todaysTopic = new Schedule {
       def task = try {
         val statusUpdate = new StatusUpdate(TodaysTopic.getTopic(new Date)+" "+Utils.timestamp)
@@ -126,7 +114,7 @@ class NukokusaBot extends Logging with WeeklyJUMP {
     weeklyJUMP.hourRange = 7 to 7
     weeklyJUMP.minRange  = 0 to 0
 
-    List[Schedule](markovTweet, todaysTopic, weeklyJUMP)
+    List[Schedule](todaysTopic)
   }
 
   private def updateStatus(status: StatusUpdate) = {
