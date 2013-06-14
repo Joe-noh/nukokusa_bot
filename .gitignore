@@ -1,6 +1,7 @@
 *.class
 *.log
 *.db
+*.jar
 
 twitter4j.properties
 config.xml
