@@ -62,11 +62,11 @@ class NukokusaBot extends Logging with WeeklyJUMP {
 
     val amazonResponse = new ResponseRule {
       def isMatch(status: Status): Boolean = {
-        status.getText.matches("^(.+)が?(欲しい|買いたい).*$")
+        status.getText.matches("^(.+)が?(ほしい|欲しい|かいたい|買いたい).*$")
       }
 
       def respondTo(status: Status): Unit = {
-        val regexp  = "^(.+)が?(欲しい|買いたい).*$".r
+        val regexp  = "^(.+)が?(ほしい|欲しい|かいたい|買いたい).*$".r
         val keyword = regexp.findFirstMatchIn(status.getText).get.group(1).diff("@nukokusa_bot").trim
 	val userName = status.getUser.getScreenName
 
@@ -114,7 +114,7 @@ class NukokusaBot extends Logging with WeeklyJUMP {
     weeklyJUMP.hourRange = 7 to 7
     weeklyJUMP.minRange  = 0 to 0
 
-    List[Schedule](todaysTopic)
+    List[Schedule](todaysTopic, weeklyJUMP)
   }
 
   private def updateStatus(status: StatusUpdate) = {
