@@ -1,6 +1,7 @@
 package jp.nukokusabot
 
 import twitter4j._
+import java.util.Random
 import java.util.Date
 import java.util.Calendar
 
@@ -11,14 +12,17 @@ class NukokusaBot extends Logging with WeeklyJUMP {
   val twitter = new TwitterFactory().getInstance
   val amazon  = new AmazonProductAdvertising
 
-  val rules = makeRules
+  val replyToReplyRules = makeReplyToReplyRules
+  val replyToMonologueRules = makeReplyToMonologueRules
   val schedules = makeSchedules
 
   val listener = new UserStreamListener {
     def onStatus(status: Status) = {
       println(status.getText)
       if (status.getText.startsWith("@nukokusa_bot") || status.getInReplyToScreenName == "nukokusa_bot") {
-        rules.find(_.isMatch(status)).get.respondTo(status)
+        replyToReplyRules.find(_.isMatch(status)).get.respondTo(status)
+      } else {
+        replyToMonologueRules.find(_.isMatch(status)).get.respondTo(status)
       }
     }
     def onBlock(sourse: User, blockedUser: User) = {}
@@ -53,13 +57,7 @@ class NukokusaBot extends Logging with WeeklyJUMP {
     stream.user
   }
 
-  private def makeRules: List[ResponseRule] = {
-    val emptyResponse = new ResponseRule {
-      def isMatch(status: Status):Boolean = true
-
-      def respondTo(status: Status): Unit = {}
-    }
-
+  private def makeReplyToReplyRules: List[ResponseRule] = {
     val amazonResponse = new ResponseRule {
       def isMatch(status: Status): Boolean = {
         status.getText.matches("^(.+)が?(ほしい|欲しい|かいたい|買いたい).*$")
@@ -84,7 +82,46 @@ class NukokusaBot extends Logging with WeeklyJUMP {
       }
     }
 
+    val emptyResponse = new ResponseRule {
+      def isMatch(status: Status):Boolean = true
+      def respondTo(status: Status): Unit = {}
+    }
+
     List[ResponseRule](amazonResponse, emptyResponse)
+  }
+
+  private def makeReplyToMonologueRules: List[ResponseRule] = {
+    val workHardResponse = new ResponseRule {
+      def isMatch(status: Status): Boolean = {
+        val random = new Random()
+        val calendar = Calendar.getInstance
+        val hour = calendar.get(Calendar.HOUR_OF_DAY)
+        val wday = calendar.get(Calendar.DAY_OF_WEEK)
+
+        random.nextInt(32) == 0 &&
+        status.getUser.getScreenName == "JO_RI" &&
+        wday != Calendar.SUNDAY &&
+        wday != Calendar.SATURDAY &&
+        ( (10 to 11).contains(hour) || (14 to 16).contains(hour) )
+      }
+
+      def respondTo(status: Status): Unit = {
+        try {
+          val text = "@"+status.getUser.getScreenName+" ツイッターしてないで働け "+Utils.timestamp
+          val statusUpdate = new StatusUpdate(text).inReplyToStatusId(status.getId)
+          updateStatus(statusUpdate)
+        } catch {
+          case e: Exception => logger.warn(e.getMessage)
+        }
+      }
+    }
+
+    val emptyResponse = new ResponseRule {
+      def isMatch(status: Status):Boolean = true
+      def respondTo(status: Status): Unit = {}
+    }
+
+    List[ResponseRule](workHardResponse, emptyResponse)
   }
 
   private def makeSchedules: List[Schedule] = {
@@ -114,7 +151,23 @@ class NukokusaBot extends Logging with WeeklyJUMP {
     weeklyJUMP.hourRange = 7 to 7
     weeklyJUMP.minRange  = 0 to 0
 
-    List[Schedule](todaysTopic, weeklyJUMP)
+    val preWeeklyJUMP = new Schedule {
+      def task = try {
+        val buyerName = getJUMPBuyerName
+        val nextBuyerName = getNextJUMPBuyerName
+
+        val text = "今週のジャンプ担当は @"+buyerName+" です。\n来週は @"+nextBuyerName+" ですよ"+" "+Utils.timestamp
+        val statusUpdate = new StatusUpdate(text)
+        updateStatus(statusUpdate)
+      } catch {
+        case e: Exception => logger.warn(e.getMessage)
+      }
+    }
+    preWeeklyJUMP.wdayRange = Calendar.SUNDAY to Calendar.SUNDAY
+    preWeeklyJUMP.hourRange = 7 to 7
+    preWeeklyJUMP.minRange  = 0 to 0
+
+    List[Schedule](todaysTopic, weeklyJUMP, preWeeklyJUMP)
   }
 
   private def updateStatus(status: StatusUpdate) = {

@@ -14,4 +14,13 @@ trait WeeklyJUMP {
     return buyers(idx)
   }
 
+  def getNextJUMPBuyerName: String = {
+    val buyers = Config.jumpBuyers
+
+    val calendar = Calendar.getInstance
+    val idx = (calendar.get(Calendar.WEEK_OF_YEAR)+1) % buyers.length
+
+    return buyers(idx)
+  }
+
 }

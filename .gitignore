@@ -24,6 +24,8 @@ project/plugins/project/
 \#*
 .\#*
 
+nohup.out
+
 .ensime
 .ensime/
 .ensime_lucene/
