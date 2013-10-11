@@ -1,4 +1,4 @@
-package jp.nukokusabot
+package net.joe_noh.nukokusabot
 
 import org.scalatest._
 import scala.collection.immutable.Range

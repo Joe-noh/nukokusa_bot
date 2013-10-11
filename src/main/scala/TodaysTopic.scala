@@ -1,4 +1,4 @@
-package jp.nukokusabot
+package net.joe_noh.nukokusabot
 
 import scala.io.Source
 import scala.util.Random

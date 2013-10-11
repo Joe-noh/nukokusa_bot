@@ -1,4 +1,4 @@
-/*package jp.nukokusabot
+/*package net.joe_noh.nukokusabot
 
 import scala.util.Random
 import scala.collection.JavaConversions._

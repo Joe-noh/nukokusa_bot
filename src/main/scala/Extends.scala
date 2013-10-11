@@ -1,4 +1,4 @@
-package jp.nukokusabot
+package net.joe_noh.nukokusabot
 
 trait Extends {
   class ListWrapper[A](self: List[A]) {

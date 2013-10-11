@@ -1,4 +1,4 @@
-package jp.nukokusabot
+package net.joe_noh.nukokusabot
 
 import java.sql.Timestamp
 import java.util.Calendar
