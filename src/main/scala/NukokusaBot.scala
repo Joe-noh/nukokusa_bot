@@ -1,7 +1,7 @@
 package net.joe_noh.nukokusabot
 
 import twitter4j._
-import java.util.Random
+import scala.util.Random
 import java.util.Date
 import java.util.Calendar
 
@@ -11,6 +11,7 @@ class NukokusaBot extends Logging with WeeklyJUMP {
 
   val twitter = new TwitterFactory().getInstance
   val amazon  = new AmazonProductAdvertising
+  //val markov  = new MarkovChain
 
   val replyToReplyRules = makeReplyToReplyRules
   val replyToMonologueRules = makeReplyToMonologueRules
@@ -66,7 +67,7 @@ class NukokusaBot extends Logging with WeeklyJUMP {
       def respondTo(status: Status): Unit = {
         val regexp  = "^(.+)が?(ほしい|欲しい|かいたい|買いたい).*$".r
         val keyword = regexp.findFirstMatchIn(status.getText).get.group(1).diff("@nukokusa_bot").trim
-	val userName = status.getUser.getScreenName
+      	val userName = status.getUser.getScreenName
 
         var text = ""
         try {
@@ -91,6 +92,16 @@ class NukokusaBot extends Logging with WeeklyJUMP {
   }
 
   private def makeReplyToMonologueRules: List[ResponseRule] = {
+    val crawlNukokusaResponse = new ResponseRule {
+      def isMatch(status: Status): Boolean = {
+        status.getUser.getScreenName == "nukokusa"
+      }
+
+      def respondTo(status: Status): Unit = {
+        //markov.addStatus(status)
+      }
+    }
+
     val workHardResponse = new ResponseRule {
       def isMatch(status: Status): Boolean = {
         val random = new Random()
@@ -127,7 +138,7 @@ class NukokusaBot extends Logging with WeeklyJUMP {
   private def makeSchedules: List[Schedule] = {
     val todaysTopic = new Schedule {
       def task = try {
-        val statusUpdate = new StatusUpdate(TodaysTopic.getTopic(new Date)+" "+Utils.timestamp)
+        val statusUpdate = new StatusUpdate(TodaysTopic.getTopic(new Date())+" "+Utils.timestamp)
         updateStatus(statusUpdate)
       } catch {
         case e: Exception => logger.warn(e.getMessage)

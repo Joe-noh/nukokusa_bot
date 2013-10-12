@@ -16,6 +16,7 @@ libraryDependencies ++= Seq(
   "ch.qos.logback" % "logback-core" % "1.0.9",
   "ch.qos.logback" % "logback-classic" % "1.0.9",
   "org.scala-lang" % "scala-actors" % "2.10.0",
+  "com.h2database" % "h2" % "1.3.173",
   "org.scalatest" %% "scalatest" % "1.9.1" % "test" )
 
 resolvers ++= Seq(
