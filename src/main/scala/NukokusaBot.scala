@@ -6,6 +6,8 @@ import java.util.Date
 import java.util.Calendar
 
 import com.typesafe.scalalogging.slf4j._
+import com.github.nscala_time.time.Imports._
+import jp.t2v.util.locale.Implicits._
 
 class NukokusaBot extends Logging with WeeklyJUMP {
 
@@ -108,11 +110,13 @@ class NukokusaBot extends Logging with WeeklyJUMP {
         val calendar = Calendar.getInstance
         val hour = calendar.get(Calendar.HOUR_OF_DAY)
         val wday = calendar.get(Calendar.DAY_OF_WEEK)
+        val userName = status.getUser.getScreenName
 
         random.nextInt(32) == 0 &&
-        status.getUser.getScreenName == "JO_RI" &&
+        userName == "JO_RI" &&
         wday != Calendar.SUNDAY &&
         wday != Calendar.SATURDAY &&
+        !(DateTime.now.isHoliday) &&
         ( (10 to 11).contains(hour) || (14 to 16).contains(hour) )
       }
 
