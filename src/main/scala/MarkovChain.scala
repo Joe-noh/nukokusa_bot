@@ -50,7 +50,7 @@ class MarkovChain {
       val id = random.nextLong() % Word.count
       val sentence = translateChainToJapanese(buildChain(id, List(id)))
       sentence match {
-      	case _ if (sentence.length == 0 || sentence.length > limit) => challenge
+        case _ if (sentence.length == 0 || sentence.length > limit) => challenge
         case _ => sentence
       }
     }

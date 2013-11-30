@@ -69,7 +69,7 @@ class NukokusaBot extends Logging with WeeklyJUMP {
       def respondTo(status: Status): Unit = {
         val regexp  = "^(.+)が?(ほしい|欲しい|かいたい|買いたい).*$".r
         val keyword = regexp.findFirstMatchIn(status.getText).get.group(1).diff("@nukokusa_bot").trim
-      	val userName = status.getUser.getScreenName
+        val userName = status.getUser.getScreenName
 
         var text = ""
         try {
@@ -151,38 +151,60 @@ class NukokusaBot extends Logging with WeeklyJUMP {
     todaysTopic.hourRange = 6 to 6
     todaysTopic.minRange  = 0 to 0
 
-    val weeklyJUMP = new Schedule {
+    val weeklyJUMPSaturday = new Schedule {
       def task = try {
-        val buyerName = getJUMPBuyerName
+        if ((DateTime.now + 2.days).isHoliday) {
+          val buyerName = getJUMPBuyerName
+          val nextBuyerName = getNextJUMPBuyerName
 
-        val text = "おい @"+buyerName+"、"+"ジャンプ買ってこいよ"+" "+Utils.timestamp
-        val statusUpdate = new StatusUpdate(text)
-        updateStatus(statusUpdate)
+          val text = "@"+buyerName+" 月曜は祝日だ！ジャンプを買え！\n来週は @"+nextBuyerName+" だ！ "+Utils.timestamp
+          val statusUpdate = new StatusUpdate(text)
+          updateStatus(statusUpdate)
+        }
       } catch {
         case e: Exception => logger.warn(e.getMessage)
       }
     }
-    weeklyJUMP.wdayRange = Calendar.MONDAY to Calendar.MONDAY
-    weeklyJUMP.hourRange = 7 to 7
-    weeklyJUMP.minRange  = 0 to 0
+    weeklyJUMPSaturday.wdayRange = Calendar.SATURDAY to Calendar.SATURDAY
+    weeklyJUMPSaturday.hourRange = 7 to 7
+    weeklyJUMPSaturday.minRange  = 0 to 0
 
-    val preWeeklyJUMP = new Schedule {
+    val weeklyJUMPSunday = new Schedule {
       def task = try {
-        val buyerName = getJUMPBuyerName
-        val nextBuyerName = getNextJUMPBuyerName
+        if (!(DateTime.now + 1.day).isHoliday) {
+          val buyerName = getJUMPBuyerName
+          val nextBuyerName = getNextJUMPBuyerName
 
-        val text = "今週のジャンプ担当は @"+buyerName+" です。\n来週は @"+nextBuyerName+" ですよ"+" "+Utils.timestamp
-        val statusUpdate = new StatusUpdate(text)
-        updateStatus(statusUpdate)
+          val text = "今週のジャンプ担当は @"+buyerName+" です。\n来週は @"+nextBuyerName+" ですよ "+Utils.timestamp
+          val statusUpdate = new StatusUpdate(text)
+          updateStatus(statusUpdate)
+        }
       } catch {
         case e: Exception => logger.warn(e.getMessage)
       }
     }
-    preWeeklyJUMP.wdayRange = Calendar.SUNDAY to Calendar.SUNDAY
-    preWeeklyJUMP.hourRange = 7 to 7
-    preWeeklyJUMP.minRange  = 0 to 0
+    weeklyJUMPSunday.wdayRange = Calendar.SUNDAY to Calendar.SUNDAY
+    weeklyJUMPSunday.hourRange = 7 to 7
+    weeklyJUMPSunday.minRange  = 0 to 0
 
-    List[Schedule](todaysTopic, weeklyJUMP, preWeeklyJUMP)
+    val weeklyJUMPMonday = new Schedule {
+      def task = try {
+        if (!DateTime.now.isHoliday) {
+          val buyerName = getJUMPBuyerName
+
+          val text = "おい @"+buyerName+"、ジャンプ買ってこいよ "+Utils.timestamp
+          val statusUpdate = new StatusUpdate(text)
+          updateStatus(statusUpdate)
+        }
+      } catch {
+        case e: Exception => logger.warn(e.getMessage)
+      }
+    }
+    weeklyJUMPMonday.wdayRange = Calendar.MONDAY to Calendar.MONDAY
+    weeklyJUMPMonday.hourRange = 7 to 7
+    weeklyJUMPMonday.minRange  = 0 to 0
+
+    List[Schedule](todaysTopic, weeklyJUMPSaturday, weeklyJUMPSunday, weeklyJUMPMonday)
   }
 
   private def updateStatus(status: StatusUpdate) = {

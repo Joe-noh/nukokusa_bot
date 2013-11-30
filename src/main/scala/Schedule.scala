@@ -4,7 +4,7 @@ import scala.collection.immutable.Range
 import java.util.Calendar
 
 abstract class Schedule {
-  var wdayRange = 1 to 7   // Sunday to Saturday
+  var wdayRange = Calendar.SUNDAY to Calendar.SATURDAY
   var dateRange = 1 to 31
   var hourRange = 0 to 23
   var minRange  = 0 to 59

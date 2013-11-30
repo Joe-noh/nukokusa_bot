@@ -9,14 +9,14 @@ class Scheduler(schedules: List[Schedule]) extends Actor {
   def act = {
     loop {
       reactWithin(interval) {
-	case scala.actors.TIMEOUT =>
+        case scala.actors.TIMEOUT =>
           val calendar = Calendar.getInstance
 
           schedules.find(_.isMatch(calendar)) match {
             case Some(schedule) => schedule.task
             case None => ()
           }
-	case _ => ()
+        case _ => ()
       }
     }
   }
