@@ -154,8 +154,8 @@ class NukokusaBot extends Logging with WeeklyJUMP {
     val weeklyJUMPSaturday = new Schedule {
       def task = try {
         if ((DateTime.now + 2.days).isHoliday) {
-          val buyerName = getJUMPBuyerName
-          val nextBuyerName = getNextJUMPBuyerName
+          val buyerName = getJUMPBuyerName(1)
+          val nextBuyerName = getNextJUMPBuyerName(1)
 
           val text = "@"+buyerName+" 月曜は祝日だ！ジャンプを買え！\n来週は @"+nextBuyerName+" だ！ "+Utils.timestamp
           val statusUpdate = new StatusUpdate(text)
